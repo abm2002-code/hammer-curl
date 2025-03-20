@@ -3,20 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hammer Curl Pose Detection</title>
+    <title>Barbell Curl Pose Detection</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; }
-        video, canvas { position: absolute; left: 50%; transform: translateX(-50%); top: 10%; }
-        #warning { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); color: red; font-size: 24px; font-weight: bold; }
+        /* FitFlex Theme - Black and Green */
+        :root {
+            --fitflex-green: #00ff7f;
+            --fitflex-dark: #121212;
+            --fitflex-darker: #0a0a0a;
+        }
+        
+        body { 
+            text-align: center; 
+            font-family: Arial, sans-serif;
+            background-color: var(--fitflex-darker);
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .app-header {
+            background-color: var(--fitflex-dark);
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 255, 127, 0.3);
+        }
+        
+        .app-title {
+            color: var(--fitflex-green);
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .app-subtitle {
+            color: white;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 90%;
+            max-width: 640px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--fitflex-green);
+        }
+        
+        video, canvas { 
+            position: relative; 
+            width: 100%;
+            height: auto;
+            display: block;
+            left: 0;
+            transform: none;
+            top: 0;
+        }
+        
+        #warning { 
+            position: absolute; 
+            top: 10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            color: #ff3b30; 
+            font-size: 24px; 
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+            z-index: 10;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .video-container {
+                width: 95%;
+            }
+            
+            #warning {
+                font-size: 18px;
+                padding: 4px 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 20px;
+            }
+            
+            .app-subtitle {
+                font-size: 12px;
+            }
+            
+            #warning {
+                font-size: 16px;
+                padding: 3px 8px;
+            }
+        }
     </style>
 </head>
 <body>
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-    <div id="warning"></div>
+    <div class="app-header">
+        <h1 class="app-title">FITFLEX</h1>
+        <p class="app-subtitle">Barbell Curl Pose Detection</p>
+    </div>
+    
+    <div class="video-container">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+        <div id="warning"></div>
+    </div>
+    
     <audio id="audio" src="elbow_forward.mp3" preload="auto"></audio> <!-- Preload audio -->
     
     <script>
@@ -92,6 +193,17 @@
             height: 480
         });
         camera.start();
+        
+        // Handle window resize for responsiveness
+        window.addEventListener('resize', () => {
+            if (video.videoWidth > 0) {
+                const containerWidth = document.querySelector('.video-container').clientWidth;
+                const scale = containerWidth / video.videoWidth;
+                // Maintain aspect ratio
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
+            }
+        });
     </script>
 </body>
 </html>
