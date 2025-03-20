@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hammer Curl Pose Detection</title>
+  <title>Barbell Curl Pose Detection</title>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
@@ -186,7 +186,67 @@
       color: var(--fitflex-green);
       font-weight: bold;
     }
+        /* Add these responsive styles to the existing CSS */
+        @media (max-width: 768px) {
+      .container {
+        padding: 0 10px;
+      }
+      
+      .video-container {
+        max-width: 100%;
+      }
+      
+      #controls {
+        max-width: 100%;
+        padding: 10px;
+      }
+      
+      .button {
+        padding: 10px 16px;
+        margin: 0 4px;
+        font-size: 14px;
+      }
+      
+      .timer {
+        font-size: 28px;
+      }
+      
+      .app-title {
+        font-size: 20px;
+      }
+      
+      .app-subtitle {
+        font-size: 12px;
+      }
+      
+      #results {
+        width: 90%;
+        max-width: 350px;
+        padding: 15px;
+      }
+    }
     
+    @media (max-width: 480px) {
+      .button {
+        padding: 8px 12px;
+        margin: 0 2px;
+        font-size: 12px;
+      }
+      
+      .timer {
+        font-size: 24px;
+      }
+      
+      .angle-display {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+      
+      #warning {
+        font-size: 14px;
+        padding: 4px 10px;
+      }
+    }
     .hidden {
       display: none;
     }
@@ -213,7 +273,7 @@
   <div class="container">
     <div class="app-header">
       <h1 class="app-title">FITFLEX</h1>
-      <p class="app-subtitle">Hammer Curl Pose Detection</p>
+      <p class="app-subtitle">Barbell Curl Pose Detection</p>
     </div>
     
     <div class="video-container">
@@ -407,7 +467,7 @@
       return angle;
     }
 
-    function detectHammerCurl(landmarks) {
+    function detectBarbellCurl(landmarks) {
       // Get relevant landmarks
       const leftShoulder = landmarks[11];
       const leftElbow = landmarks[13];
@@ -420,13 +480,14 @@
       // Calculate angles
       const leftElbowAngle = calculateAngle(leftShoulder, leftElbow, leftWrist);
       const rightElbowAngle = calculateAngle(rightShoulder, rightElbow, rightWrist);
-            // Update angle display
-            leftAngleElement.textContent = `${Math.round(leftElbowAngle)}°`;
+      
+      // Update angle display
+      leftAngleElement.textContent = `${Math.round(leftElbowAngle)}°`;
       rightAngleElement.textContent = `${Math.round(rightElbowAngle)}°`;
       
       // Check for proper form
       if (isExercising) {
-        // Define acceptable angle ranges for hammer curl
+        // Define acceptable angle ranges for barbell curl
         const minAngle = 40;  // Minimum angle when arms are bent (up position)
         const maxAngle = 160; // Maximum angle when arms are straight (down position)
         
@@ -456,11 +517,16 @@
           warningMessage = "Keep elbows close to your body";
         }
         
-        // Check if wrists are not in neutral position
-        // This is a simplified check - in a real app you'd want more sophisticated checks
-        if (leftWrist.y > leftElbow.y || rightWrist.y > rightElbow.y) {
+        // Check if shoulders are raised (simplified check)
+        const leftShoulderHeight = leftShoulder.y;
+        const rightShoulderHeight = rightShoulder.y;
+        const initialLeftShoulderHeight = 0.3; // Approximate value, should be calibrated
+        const initialRightShoulderHeight = 0.3; // Approximate value, should be calibrated
+        
+        if (leftShoulderHeight < initialLeftShoulderHeight - 0.05 || 
+            rightShoulderHeight < initialRightShoulderHeight - 0.05) {
           isMistake = true;
-          warningMessage = "Keep wrists in neutral position";
+          warningMessage = "Keep shoulders down";
         }
         
         // Display warning if there's a mistake
@@ -502,8 +568,8 @@
           radius: 6
         });
         
-        // Process the pose for hammer curl detection
-        detectHammerCurl(results.poseLandmarks);
+        // Process the pose for barbell curl detection
+        detectBarbellCurl(results.poseLandmarks);
       }
     });
 
@@ -519,7 +585,19 @@
       height: 480
     });
     camera.start();
+    
+    // Handle window resize for responsiveness
+    window.addEventListener('resize', handleResize);
+    
+    function handleResize() {
+      // Adjust canvas size if needed
+      if (video.videoWidth > 0) {
+        const containerWidth = document.querySelector('.video-container').clientWidth;
+        const scale = containerWidth / video.videoWidth;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+      }
+    }
   </script>
 </body>
 </html>
-      // Update angle
